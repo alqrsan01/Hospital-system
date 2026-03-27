@@ -69,6 +69,31 @@ router.get('/me', authenticate, async (req, res) => {
   }
 });
 
+// PUT /api/auth/password  — change own password
+router.put('/password', authenticate, async (req, res) => {
+  try {
+    const { current_password, new_password } = req.body;
+    if (!current_password || !new_password)
+      return res.status(400).json({ message: 'Both current and new password are required' });
+    if (new_password.length < 6)
+      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+
+    const db = await getDb();
+    const [rows] = await db.execute('SELECT password_hash FROM users WHERE id = ?', [req.user.id]);
+    if (!rows[0]) return res.status(404).json({ message: 'User not found' });
+
+    const valid = await bcrypt.compare(current_password, rows[0].password_hash);
+    if (!valid) return res.status(401).json({ message: 'Current password is incorrect' });
+
+    const newHash = await bcrypt.hash(new_password, 10);
+    await db.execute('UPDATE users SET password_hash = ? WHERE id = ?', [newHash, req.user.id]);
+    res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // POST /api/auth/logout  — client just drops token, but we acknowledge
 router.post('/logout', authenticate, (req, res) => {
   res.json({ message: 'Logged out successfully' });

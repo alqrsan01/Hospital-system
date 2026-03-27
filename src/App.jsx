@@ -13,6 +13,7 @@ import QueueMonitor from './pages/admin/QueueMonitor.jsx';
 import ManagerDashboard from './pages/manager/ManagerDashboard.jsx';
 import ManagerReports from './pages/manager/ManagerReports.jsx';
 import PatientHistory from './pages/admin/PatientHistory.jsx';
+import Profile from './pages/Profile.jsx';
 import DoctorQueue from './pages/doctor/DoctorQueue.jsx';
 import WaitingScreen from './pages/screen/WaitingScreen.jsx';
 
@@ -69,6 +70,13 @@ function AppRoutes() {
       <Route path="/screen" element={
         <ProtectedRoute roles={['screen']}>
           <WaitingScreen />
+        </ProtectedRoute>
+      } />
+
+      {/* Profile — all authenticated roles */}
+      <Route path="/profile" element={
+        <ProtectedRoute roles={['admin', 'manager', 'doctor', 'screen']}>
+          <Layout><Profile /></Layout>
         </ProtectedRoute>
       } />
 

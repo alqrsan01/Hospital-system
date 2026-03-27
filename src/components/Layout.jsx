@@ -61,13 +61,13 @@ export default function Layout({ children }) {
         </nav>
 
         <div className="sidebar-footer">
-          <div className="user-info">
+          <Link to="/profile" className="user-info user-info-link">
             <div className="user-avatar">{displayName?.[0]}</div>
             <div>
               <div className="user-name">{displayName}</div>
               <div className="user-role">{t(user?.role)}</div>
             </div>
-          </div>
+          </Link>
           <button className="btn-lang" onClick={toggleLang}>
             {lang === 'en' ? 'عربي' : 'EN'}
           </button>
