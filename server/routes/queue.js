@@ -126,11 +126,11 @@ router.get('/', requireRole('admin', 'manager', 'doctor', 'screen'), async (req,
   }
 });
 
-// GET /api/queue/stats  — today's summary
+// GET /api/queue/stats  — daily summary (today by default, or ?date=YYYY-MM-DD)
 router.get('/stats', requireRole('admin', 'manager'), async (req, res) => {
   try {
     const db = await getDb();
-    const today = new Date().toISOString().slice(0, 10);
+    const today = req.query.date || new Date().toISOString().slice(0, 10);
 
     const [totals] = await db.execute(`
       SELECT status, COUNT(*) as cnt
@@ -233,6 +233,53 @@ router.put('/:id/status', requireRole('admin', 'manager', 'doctor'), async (req,
     res.json({ message: 'Status updated' });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// POST /api/queue/:id/transfer  — transfer patient to pharmacy (or any dept/clinic)
+router.post('/:id/transfer', requireRole('admin', 'manager', 'doctor'), async (req, res) => {
+  const db = await getDb();
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const { target_department_id, target_clinic_id, notes } = req.body;
+    if (!target_department_id && !target_clinic_id)
+      return res.status(400).json({ message: 'Must specify target department or clinic' });
+
+    // Get original ticket + patient
+    const [rows] = await conn.execute(
+      'SELECT patient_id, priority FROM queue_tickets WHERE id = ?',
+      [req.params.id]
+    );
+    if (!rows[0]) return res.status(404).json({ message: 'Ticket not found' });
+
+    const { patient_id, priority } = rows[0];
+
+    // Mark original as transferred
+    await conn.execute(
+      'UPDATE queue_tickets SET status = ?, done_at = ? WHERE id = ?',
+      ['transferred', new Date(), req.params.id]
+    );
+
+    // Generate new ticket number for target
+    const newTicketNum = await generateTicketNumber(db, target_clinic_id || null, target_department_id || null);
+
+    // Create new ticket in pharmacy/target
+    const [result] = await conn.execute(
+      `INSERT INTO queue_tickets (ticket_number, patient_id, clinic_id, department_id, priority, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [newTicketNum, patient_id, target_clinic_id || null, target_department_id || null, priority, notes || null]
+    );
+
+    await conn.commit();
+    res.status(201).json({ id: result.insertId, ticket_number: newTicketNum, message: 'Patient transferred' });
+  } catch (err) {
+    await conn.rollback();
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  } finally {
+    conn.release();
   }
 });
 

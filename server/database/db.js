@@ -109,11 +109,18 @@ export async function initDb() {
       name_en VARCHAR(100) NOT NULL,
       name_ar VARCHAR(100) NOT NULL,
       clinic_id INT,
+      department_id INT,
       is_active TINYINT(1) NOT NULL DEFAULT 1,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (clinic_id) REFERENCES clinics(id)
+      FOREIGN KEY (clinic_id) REFERENCES clinics(id),
+      FOREIGN KEY (department_id) REFERENCES departments(id)
     )
   `);
+
+  await db.execute(`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS department_id INT,
+    ADD CONSTRAINT IF NOT EXISTS fk_users_dept FOREIGN KEY (department_id) REFERENCES departments(id)
+  `).catch(() => {});
 
   await seedDefaults(db);
   console.log('✅ Database initialized successfully');

@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext.jsx';
 import Modal from '../../components/Modal.jsx';
 import ConfirmDialog from '../../components/ConfirmDialog.jsx';
 
-const EMPTY = { username: '', password: '', role: 'doctor', name_en: '', name_ar: '', clinic_id: '', is_active: 1 };
+const EMPTY = { username: '', password: '', role: 'doctor', name_en: '', name_ar: '', clinic_id: '', department_id: '', assignment_type: 'clinic', is_active: 1 };
 
 const ROLE_COLORS = { admin: 'role-admin', manager: 'role-manager', doctor: 'role-doctor', screen: 'role-screen' };
 
@@ -14,6 +14,7 @@ export default function Users() {
   const { user: currentUser } = useAuth();
   const [items, setItems] = useState([]);
   const [clinics, setClinics] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY);
   const [editing, setEditing] = useState(null);
@@ -23,12 +24,14 @@ export default function Users() {
 
   const load = async () => {
     try {
-      const [usersRes, clinicsRes] = await Promise.all([
+      const [usersRes, clinicsRes, deptsRes] = await Promise.all([
         axios.get('/api/users'),
         axios.get('/api/clinics'),
+        axios.get('/api/departments'),
       ]);
       setItems(usersRes.data);
       setClinics(clinicsRes.data);
+      setDepartments(deptsRes.data.filter(d => d.is_active));
     } finally {
       setLoading(false);
     }
@@ -38,7 +41,8 @@ export default function Users() {
 
   const openAdd = () => { setForm(EMPTY); setEditing(null); setError(''); setShowModal(true); };
   const openEdit = (item) => {
-    setForm({ username: item.username, password: '', role: item.role, name_en: item.name_en, name_ar: item.name_ar, clinic_id: item.clinic_id || '', is_active: item.is_active });
+    const assignment_type = item.department_id ? 'department' : 'clinic';
+    setForm({ username: item.username, password: '', role: item.role, name_en: item.name_en, name_ar: item.name_ar, clinic_id: item.clinic_id || '', department_id: item.department_id || '', assignment_type, is_active: item.is_active });
     setEditing(item.id); setError(''); setShowModal(true);
   };
   const closeModal = () => { setShowModal(false); setError(''); };
@@ -46,7 +50,12 @@ export default function Users() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const payload = { ...form, clinic_id: form.clinic_id || null };
+    const payload = {
+      ...form,
+      clinic_id: form.role === 'doctor' && form.assignment_type === 'clinic' ? form.clinic_id || null : null,
+      department_id: form.role === 'doctor' && form.assignment_type === 'department' ? form.department_id || null : null,
+    };
+    delete payload.assignment_type;
     if (editing && !payload.password) delete payload.password;
     try {
       if (editing) {
@@ -95,7 +104,7 @@ export default function Users() {
                 <th>{isRTL ? 'اسم المستخدم' : 'Username'}</th>
                 <th>{isRTL ? 'الاسم' : 'Full Name'}</th>
                 <th>{isRTL ? 'الدور' : 'Role'}</th>
-                <th>{isRTL ? 'العيادة' : 'Clinic'}</th>
+                <th>{isRTL ? 'التعيين' : 'Assignment'}</th>
                 <th>{t('active')}</th>
                 <th>{t('actions')}</th>
               </tr>
@@ -107,7 +116,11 @@ export default function Users() {
                   <td><strong>{item.username}</strong></td>
                   <td>{isRTL ? item.name_ar : item.name_en}</td>
                   <td><span className={`role-badge ${ROLE_COLORS[item.role]}`}>{roleLabel(item.role)}</span></td>
-                  <td>{isRTL ? item.clinic_name_ar : item.clinic_name_en || '—'}</td>
+                  <td>
+                    {item.department_id
+                      ? (isRTL ? item.dept_name_ar : item.dept_name_en) || '—'
+                      : (isRTL ? item.clinic_name_ar : item.clinic_name_en) || '—'}
+                  </td>
                   <td>
                     <span className={`status-badge ${item.is_active ? 'active' : 'inactive'}`}>
                       {item.is_active ? t('active') : t('inactive')}
@@ -159,7 +172,7 @@ export default function Users() {
             <div className="form-row">
               <div className="form-group">
                 <label>{isRTL ? 'الدور' : 'Role'}</label>
-                <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value, clinic_id: '' })}>
+                <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value, clinic_id: '', department_id: '', assignment_type: 'clinic' })}>
                   <option value="admin">{isRTL ? 'مدير النظام' : 'Admin'}</option>
                   <option value="manager">{isRTL ? 'مدير' : 'Manager'}</option>
                   <option value="doctor">{isRTL ? 'طبيب' : 'Doctor'}</option>
@@ -176,15 +189,41 @@ export default function Users() {
             </div>
 
             {form.role === 'doctor' && (
-              <div className="form-group">
-                <label>{isRTL ? 'العيادة' : 'Clinic'}</label>
-                <select value={form.clinic_id} onChange={e => setForm({ ...form, clinic_id: e.target.value })}>
-                  <option value="">{isRTL ? '-- اختر عيادة --' : '-- Select Clinic --'}</option>
-                  {clinics.map(c => (
-                    <option key={c.id} value={c.id}>{isRTL ? c.name_ar : c.name_en}</option>
-                  ))}
-                </select>
-              </div>
+              <>
+                <div className="dest-toggle" style={{ marginBottom: 8 }}>
+                  <button type="button"
+                    className={`dest-btn ${form.assignment_type === 'clinic' ? 'active' : ''}`}
+                    onClick={() => setForm({ ...form, assignment_type: 'clinic', department_id: '' })}>
+                    🏥 {isRTL ? 'عيادة' : 'Clinic'}
+                  </button>
+                  <button type="button"
+                    className={`dest-btn ${form.assignment_type === 'department' ? 'active' : ''}`}
+                    onClick={() => setForm({ ...form, assignment_type: 'department', clinic_id: '' })}>
+                    🏪 {isRTL ? 'قسم' : 'Department'}
+                  </button>
+                </div>
+                {form.assignment_type === 'clinic' ? (
+                  <div className="form-group">
+                    <label>{isRTL ? 'العيادة' : 'Clinic'}</label>
+                    <select value={form.clinic_id} onChange={e => setForm({ ...form, clinic_id: e.target.value })}>
+                      <option value="">{isRTL ? '-- اختر عيادة --' : '-- Select Clinic --'}</option>
+                      {clinics.map(c => (
+                        <option key={c.id} value={c.id}>{isRTL ? c.name_ar : c.name_en}</option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="form-group">
+                    <label>{isRTL ? 'القسم' : 'Department'}</label>
+                    <select value={form.department_id} onChange={e => setForm({ ...form, department_id: e.target.value })}>
+                      <option value="">{isRTL ? '-- اختر قسماً --' : '-- Select Department --'}</option>
+                      {departments.map(d => (
+                        <option key={d.id} value={d.id}>{isRTL ? d.name_ar : d.name_en}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </>
             )}
 
             {error && <div className="alert-error">{error}</div>}

@@ -33,6 +33,7 @@ router.post('/login', async (req, res) => {
       name_en: user.name_en,
       name_ar: user.name_ar,
       clinic_id: user.clinic_id,
+      department_id: user.department_id,
     });
 
     res.json({
@@ -44,6 +45,7 @@ router.post('/login', async (req, res) => {
         name_en: user.name_en,
         name_ar: user.name_ar,
         clinic_id: user.clinic_id,
+        department_id: user.department_id,
       },
     });
   } catch (err) {
@@ -57,7 +59,7 @@ router.get('/me', authenticate, async (req, res) => {
   try {
     const db = await getDb();
     const [rows] = await db.execute(
-      'SELECT id, username, role, name_en, name_ar, clinic_id FROM users WHERE id = ? AND is_active = 1',
+      'SELECT id, username, role, name_en, name_ar, clinic_id, department_id FROM users WHERE id = ? AND is_active = 1',
       [req.user.id]
     );
     if (!rows[0]) return res.status(404).json({ message: 'User not found' });

@@ -18,28 +18,42 @@ export default function DoctorQueue() {
   const [waiting, setWaiting]   = useState([]);
   const [current, setCurrent]   = useState(null);
   const [done, setDone]         = useState([]);
-  const [clinicName, setClinicName] = useState('');
+  const [placeName, setPlaceName] = useState('');
   const [loading, setLoading]   = useState(true);
   const [calling, setCalling]   = useState(false);
   const [lastUpdate, setLastUpdate] = useState('');
+  const [pharmacyDepts, setPharmacyDepts] = useState([]);
+  const [showTransfer, setShowTransfer] = useState(false);
 
   const clinicId = user?.clinic_id;
+  const deptId = user?.department_id;
+  const queueParam = clinicId ? `clinic_id=${clinicId}` : `department_id=${deptId}`;
 
-  // Fetch clinic name once — it never changes during a session
+  // Fetch place name + pharmacy departments once on mount
   useEffect(() => {
-    if (!clinicId) return;
-    axios.get('/api/clinics').then(res => {
-      const clinic = res.data.find(c => c.id === clinicId);
-      setClinicName(isRTL ? clinic?.name_ar : clinic?.name_en);
+    if (clinicId) {
+      axios.get('/api/clinics').then(res => {
+        const clinic = res.data.find(c => c.id === clinicId);
+        setPlaceName(isRTL ? clinic?.name_ar : clinic?.name_en);
+      }).catch(() => {});
+    } else if (deptId) {
+      axios.get('/api/departments').then(res => {
+        const dept = res.data.find(d => d.id === deptId);
+        setPlaceName(isRTL ? dept?.name_ar : dept?.name_en);
+      }).catch(() => {});
+    }
+    // Load pharmacy departments for transfer
+    axios.get('/api/departments').then(res => {
+      setPharmacyDepts(res.data.filter(d => d.type === 'pharmacy' && d.is_active));
     }).catch(() => {});
-  }, [clinicId, isRTL]);
+  }, [clinicId, deptId, isRTL]);
 
   const load = useCallback(async () => {
-    if (!clinicId) return;
+    if (!clinicId && !deptId) return;
     try {
       const [activeRes, doneRes] = await Promise.all([
-        axios.get(`/api/queue?clinic_id=${clinicId}&status=waiting,called,in_progress`),
-        axios.get(`/api/queue?clinic_id=${clinicId}&status=done,no_show`),
+        axios.get(`/api/queue?${queueParam}&status=waiting,called,in_progress`),
+        axios.get(`/api/queue?${queueParam}&status=done,no_show`),
       ]);
 
       const all = activeRes.data;
@@ -52,7 +66,7 @@ export default function DoctorQueue() {
     } finally {
       setLoading(false);
     }
-  }, [clinicId]);
+  }, [clinicId, deptId, queueParam]);
 
   useEffect(() => {
     load();
@@ -91,13 +105,24 @@ export default function DoctorQueue() {
     await updateStatus(ticket.id, 'called');
   };
 
-  if (!clinicId) {
+  const transferToPharmacy = async (targetDeptId) => {
+    if (!current) return;
+    try {
+      await axios.post(`/api/queue/${current.id}/transfer`, { target_department_id: targetDeptId });
+      setShowTransfer(false);
+      await load();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Transfer failed');
+    }
+  };
+
+  if (!clinicId && !deptId) {
     return (
       <div className="page">
         <div className="no-clinic-warning">
           <div style={{ fontSize: 48 }}>⚠️</div>
-          <h2>{isRTL ? 'لم يتم تعيين عيادة' : 'No Clinic Assigned'}</h2>
-          <p>{isRTL ? 'يرجى التواصل مع المدير لتعيين عيادة لحسابك.' : 'Please contact the admin to assign a clinic to your account.'}</p>
+          <h2>{isRTL ? 'لم يتم تعيين عيادة أو قسم' : 'No Clinic or Department Assigned'}</h2>
+          <p>{isRTL ? 'يرجى التواصل مع المدير لتعيين مكان عمل لحسابك.' : 'Please contact the admin to assign a clinic or department to your account.'}</p>
         </div>
       </div>
     );
@@ -110,7 +135,7 @@ export default function DoctorQueue() {
       {/* Header */}
       <div className="doctor-header">
         <div>
-          <h1>🏥 {clinicName || (isRTL ? 'عيادتي' : 'My Clinic')}</h1>
+          <h1>🏥 {placeName || (isRTL ? 'مكان عملي' : 'My Station')}</h1>
           <p className="doctor-date">
             {new Date().toLocaleDateString(isRTL ? 'ar-SA' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             {lastUpdate && ` · ${isRTL ? 'آخر تحديث' : 'Updated'} ${lastUpdate}`}
@@ -176,7 +201,33 @@ export default function DoctorQueue() {
                       onClick={() => updateStatus(current.id, 'in_progress')}>
                       🔄 {isRTL ? 'جارٍ' : 'In Progress'}
                     </button>
+                    {pharmacyDepts.length > 0 && (
+                      <button className="cp-btn cp-transfer"
+                        onClick={() => setShowTransfer(true)}>
+                        💊 {isRTL ? 'تحويل للصيدلية' : 'Transfer to Pharmacy'}
+                      </button>
+                    )}
                   </div>
+
+                  {showTransfer && (
+                    <div className="transfer-panel">
+                      <div className="transfer-title">
+                        {isRTL ? 'اختر الصيدلية:' : 'Select pharmacy:'}
+                      </div>
+                      <div className="transfer-options">
+                        {pharmacyDepts.map(d => (
+                          <button key={d.id} className="transfer-opt-btn"
+                            onClick={() => transferToPharmacy(d.id)}>
+                            💊 {isRTL ? d.name_ar : d.name_en}
+                          </button>
+                        ))}
+                      </div>
+                      <button className="transfer-cancel"
+                        onClick={() => setShowTransfer(false)}>
+                        {isRTL ? 'إلغاء' : 'Cancel'}
+                      </button>
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="cp-empty">

@@ -386,6 +386,41 @@ body {
 .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
 .card-hint { color: var(--color-text-muted); font-size: 13px; }
 
+.dashboard-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 24px;
+}
+@media (max-width: 900px) {
+  .dashboard-two-col { grid-template-columns: 1fr; }
+}
+
+.quick-link-card {
+  text-decoration: none;
+  color: inherit;
+  text-align: center;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.quick-link-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+.quick-link-card h3 { margin-bottom: 0; }
+
+.section-heading {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
 /* ─── Waiting Screen ────────────────────────────── */
 .waiting-screen {
   min-height: 100vh;
@@ -1042,6 +1077,39 @@ body {
 .cp-noshow:hover { background: #9b2c2c; }
 .cp-progress { background: #dd6b20; color: white; }
 .cp-progress:hover { background: #b7510e; }
+.cp-transfer { background: #553c9a; color: white; }
+.cp-transfer:hover { background: #44337a; }
+
+.transfer-panel {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--color-bg);
+  border: 1px solid #553c9a;
+  border-radius: var(--radius);
+}
+.transfer-title { font-weight: 600; margin-bottom: 8px; color: #553c9a; }
+.transfer-options { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.transfer-opt-btn {
+  padding: 8px 14px;
+  background: #553c9a;
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: var(--transition);
+}
+.transfer-opt-btn:hover { background: #44337a; }
+.transfer-cancel {
+  background: none;
+  border: 1px solid var(--color-border);
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
 
 .cp-empty {
   display: flex;
