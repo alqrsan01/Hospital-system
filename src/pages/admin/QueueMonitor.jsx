@@ -1,23 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useLanguage } from '../../contexts/LanguageContext.jsx';
-
-const PRIORITY_META = {
-  1: { color: '#e53e3e', labelEn: 'Resuscitation', labelAr: 'إنعاش' },
-  2: { color: '#dd6b20', labelEn: 'Emergent',      labelAr: 'طارئ' },
-  3: { color: '#d69e2e', labelEn: 'Urgent',        labelAr: 'عاجل' },
-  4: { color: '#38a169', labelEn: 'Semi-urgent',   labelAr: 'شبه عاجل' },
-  5: { color: '#3182ce', labelEn: 'Non-urgent',    labelAr: 'غير عاجل' },
-};
-
-const STATUS_META = {
-  waiting:     { labelEn: 'Waiting',     labelAr: 'انتظار',    cls: 'status-waiting' },
-  called:      { labelEn: 'Called',      labelAr: 'تم النداء', cls: 'status-called' },
-  in_progress: { labelEn: 'In Progress', labelAr: 'جارٍ',      cls: 'status-progress' },
-  done:        { labelEn: 'Done',        labelAr: 'منتهى',     cls: 'status-done' },
-  no_show:     { labelEn: 'No-show',     labelAr: 'لم يحضر',  cls: 'status-noshow' },
-  transferred: { labelEn: 'Transferred', labelAr: 'محوّل',    cls: 'status-transferred' },
-};
+import { PRIORITY_META, STATUS_META } from '../../constants/queue.js';
 
 const ALL_STATUSES = 'waiting,called,in_progress,done,no_show,transferred';
 
@@ -39,7 +23,6 @@ export default function QueueMonitor() {
       setStats(sRes.data);
       setLastUpdate(new Date().toLocaleTimeString());
     } catch {
-      // silently retry
     } finally {
       setLoading(false);
     }
@@ -47,7 +30,7 @@ export default function QueueMonitor() {
 
   useEffect(() => {
     load();
-    const interval = setInterval(load, 10000); // auto-refresh every 10s
+    const interval = setInterval(load, 10000);
     return () => clearInterval(interval);
   }, [load]);
 

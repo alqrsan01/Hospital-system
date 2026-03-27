@@ -11,8 +11,6 @@ import Clinics from './pages/admin/Clinics.jsx';
 import RegisterPatient from './pages/admin/RegisterPatient.jsx';
 import QueueMonitor from './pages/admin/QueueMonitor.jsx';
 import ManagerDashboard from './pages/manager/ManagerDashboard.jsx';
-import ManagerQueueMonitor from './pages/admin/QueueMonitor.jsx';
-import ManagerRegister from './pages/admin/RegisterPatient.jsx';
 import DoctorQueue from './pages/doctor/DoctorQueue.jsx';
 import WaitingScreen from './pages/screen/WaitingScreen.jsx';
 
@@ -43,8 +41,8 @@ function AppRoutes() {
           <Layout>
             <Routes>
               <Route index element={<ManagerDashboard />} />
-              <Route path="register" element={<ManagerRegister />} />
-              <Route path="queue" element={<ManagerQueueMonitor />} />
+              <Route path="register" element={<RegisterPatient />} />
+              <Route path="queue" element={<QueueMonitor />} />
             </Routes>
           </Layout>
         </ProtectedRoute>

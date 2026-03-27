@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLanguage } from '../../contexts/LanguageContext.jsx';
-
-const PRIORITY_OPTIONS = [
-  { value: 1, color: '#e53e3e', labelEn: '1 — Resuscitation', labelAr: '١ — إنعاش' },
-  { value: 2, color: '#dd6b20', labelEn: '2 — Emergent',      labelAr: '٢ — طارئ' },
-  { value: 3, color: '#d69e2e', labelEn: '3 — Urgent',        labelAr: '٣ — عاجل' },
-  { value: 4, color: '#38a169', labelEn: '4 — Semi-urgent',   labelAr: '٤ — شبه عاجل' },
-  { value: 5, color: '#3182ce', labelEn: '5 — Non-urgent',    labelAr: '٥ — غير عاجل' },
-];
+import { PRIORITY_OPTIONS } from '../../constants/queue.js';
 
 const EMPTY_FORM = {
   name_en: '', name_ar: '', age: '', gender: 'male',

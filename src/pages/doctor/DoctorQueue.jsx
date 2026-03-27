@@ -2,14 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { useLanguage } from '../../contexts/LanguageContext.jsx';
-
-const PRIORITY_META = {
-  1: { color: '#e53e3e', labelEn: 'Resuscitation', labelAr: 'إنعاش' },
-  2: { color: '#dd6b20', labelEn: 'Emergent',      labelAr: 'طارئ' },
-  3: { color: '#d69e2e', labelEn: 'Urgent',        labelAr: 'عاجل' },
-  4: { color: '#38a169', labelEn: 'Semi-urgent',   labelAr: 'شبه عاجل' },
-  5: { color: '#3182ce', labelEn: 'Non-urgent',    labelAr: 'غير عاجل' },
-};
+import { PRIORITY_META } from '../../constants/queue.js';
 
 function timeSince(dateStr) {
   const diff = Math.floor((Date.now() - new Date(dateStr)) / 60000);
@@ -23,7 +16,7 @@ export default function DoctorQueue() {
   const { isRTL } = useLanguage();
 
   const [waiting, setWaiting]   = useState([]);
-  const [current, setCurrent]   = useState(null); // called or in_progress
+  const [current, setCurrent]   = useState(null);
   const [done, setDone]         = useState([]);
   const [clinicName, setClinicName] = useState('');
   const [loading, setLoading]   = useState(true);
@@ -32,29 +25,34 @@ export default function DoctorQueue() {
 
   const clinicId = user?.clinic_id;
 
+  // Fetch clinic name once — it never changes during a session
+  useEffect(() => {
+    if (!clinicId) return;
+    axios.get('/api/clinics').then(res => {
+      const clinic = res.data.find(c => c.id === clinicId);
+      setClinicName(isRTL ? clinic?.name_ar : clinic?.name_en);
+    }).catch(() => {});
+  }, [clinicId, isRTL]);
+
   const load = useCallback(async () => {
     if (!clinicId) return;
     try {
-      const [activeRes, doneRes, clinicRes] = await Promise.all([
+      const [activeRes, doneRes] = await Promise.all([
         axios.get(`/api/queue?clinic_id=${clinicId}&status=waiting,called,in_progress`),
         axios.get(`/api/queue?clinic_id=${clinicId}&status=done,no_show`),
-        axios.get('/api/clinics'),
       ]);
 
       const all = activeRes.data;
       setCurrent(all.find(t => t.status === 'called' || t.status === 'in_progress') || null);
       setWaiting(all.filter(t => t.status === 'waiting'));
-      setDone(doneRes.data.slice(0, 10)); // last 10 done
-
-      const clinic = clinicRes.data.find(c => c.id === clinicId);
-      setClinicName(isRTL ? clinic?.name_ar : clinic?.name_en);
+      setDone(doneRes.data.slice(0, 10));
       setLastUpdate(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
     } catch {
-      // retry on next interval
+      // silent — retry on next interval
     } finally {
       setLoading(false);
     }
-  }, [clinicId, isRTL]);
+  }, [clinicId]);
 
   useEffect(() => {
     load();

@@ -1,14 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { useLanguage } from '../../contexts/LanguageContext.jsx';
-
-const PRIORITY_META = {
-  1: { color: '#e53e3e', labelEn: 'Resuscitation', labelAr: 'إنعاش' },
-  2: { color: '#dd6b20', labelEn: 'Emergent',      labelAr: 'طارئ'  },
-  3: { color: '#d69e2e', labelEn: 'Urgent',        labelAr: 'عاجل'  },
-  4: { color: '#38a169', labelEn: 'Semi-urgent',   labelAr: 'شبه عاجل' },
-  5: { color: '#3182ce', labelEn: 'Non-urgent',    labelAr: 'غير عاجل' },
-};
+import { PRIORITY_META } from '../../constants/queue.js';
 
 const TYPE_ICON = { emergency: '🚨', clinic: '🏥', pharmacy: '💊' };
 
@@ -27,25 +20,21 @@ export default function WaitingScreen() {
   const [groups, setGroups]     = useState([]);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState(false);
-  const [flash, setFlash]       = useState(null); // ticket_number of newly called
+  const [flash, setFlash]       = useState(null);
   const clock = useClock();
 
-  const prevServing = useState({})[0]; // ref to detect changes
+  const prevServing = useRef({});
 
   const load = useCallback(async () => {
     try {
       const res = await axios.get('/api/queue/screen');
       const incoming = res.data;
 
-      // Detect newly called tickets → flash animation
       for (const g of incoming) {
-        if (g.serving) {
-          const prev = prevServing[g.key];
-          if (prev !== g.serving.ticket_number) {
-            prevServing[g.key] = g.serving.ticket_number;
-            setFlash(g.serving.ticket_number);
-            setTimeout(() => setFlash(null), 4000);
-          }
+        if (g.serving && prevServing.current[g.key] !== g.serving.ticket_number) {
+          prevServing.current[g.key] = g.serving.ticket_number;
+          setFlash(g.serving.ticket_number);
+          setTimeout(() => setFlash(null), 4000);
         }
       }
 
@@ -56,7 +45,7 @@ export default function WaitingScreen() {
     } finally {
       setLoading(false);
     }
-  }, []); // eslint-disable-line
+  }, []);
 
   useEffect(() => {
     load();
@@ -167,7 +156,7 @@ function ClinicPanel({ group, isRTL, flash, large }) {
   const name    = isRTL ? group.nameAr : group.nameEn;
   const icon    = TYPE_ICON[group.type] || '🏥';
   const serving = group.serving;
-  const waiting = group.waiting.slice(0, 5); // show max 5 next
+  const waiting = group.waiting.slice(0, 5);
   const pm      = serving ? PRIORITY_META[serving.priority] : null;
   const isFlashing = serving && flash === serving.ticket_number;
 
