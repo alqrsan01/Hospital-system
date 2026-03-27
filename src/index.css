@@ -633,10 +633,302 @@ body {
 
 .label-hint { font-size: 11px; color: var(--color-text-muted); font-weight: 400; }
 
+/* ─── Register Patient ──────────────────────────── */
+.register-grid { display: flex; flex-direction: column; gap: 24px; }
+
+.card-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-border);
+  color: var(--color-primary);
+}
+
+.register-form { display: flex; flex-direction: column; gap: 16px; }
+
+.section-divider {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8px 0 4px;
+  border-top: 1px solid var(--color-border);
+  margin-top: 4px;
+}
+
+/* Destination toggle */
+.dest-toggle { display: flex; gap: 10px; }
+
+.dest-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: var(--transition);
+  color: var(--color-text-muted);
+}
+
+.dest-btn.active {
+  border-color: var(--color-primary);
+  background: #eff6ff;
+  color: var(--color-primary);
+}
+
+/* Priority selector */
+.priority-selector { display: flex; flex-direction: column; gap: 8px; }
+
+.priority-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: var(--transition);
+  color: var(--color-text);
+  text-align: start;
+}
+
+.priority-btn:hover { border-color: var(--p-color); }
+
+.priority-btn.selected {
+  border-color: var(--p-color);
+  background: color-mix(in srgb, var(--p-color) 10%, white);
+  color: var(--p-color);
+}
+
+.priority-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--p-color);
+  flex-shrink: 0;
+}
+
+.priority-preview {
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+/* Ticket success */
+.ticket-success {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.ticket-card {
+  background: var(--color-surface);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  border: 2px solid #c6f6d5;
+  min-width: 280px;
+}
+
+.ticket-icon { font-size: 48px; margin-bottom: 12px; }
+
+.ticket-number {
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--color-primary);
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.ticket-label {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+/* ─── Queue Monitor ─────────────────────────────── */
+.queue-stats-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.queue-stat-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--color-surface);
+  border: 2px solid var(--chip-color);
+  border-radius: 10px;
+  padding: 12px 20px;
+  min-width: 80px;
+}
+
+.chip-count {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--chip-color);
+  line-height: 1;
+}
+
+.chip-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.filter-btn {
+  padding: 7px 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 20px;
+  background: var(--color-surface);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: var(--transition);
+}
+
+.filter-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.filter-btn.active { background: var(--color-primary); border-color: var(--color-primary); color: white; }
+
+.clinic-queue-section { margin-bottom: 32px; }
+
+.clinic-queue-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: var(--color-text);
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.tickets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.ticket-item {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  border: 2px solid var(--t-color, var(--color-border));
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow);
+}
+
+.ticket-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ticket-num {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--t-color, var(--color-primary));
+  letter-spacing: 1px;
+}
+
+.ticket-patient { display: flex; flex-direction: column; gap: 2px; }
+.ticket-patient strong { font-size: 15px; }
+.ticket-patient span { font-size: 12px; color: var(--color-text-muted); }
+
+.ticket-priority {
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+.ticket-notes {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  background: #f7fafc;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.ticket-time { font-size: 12px; color: var(--color-text-muted); }
+
+.ticket-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+
+.tact-btn {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tact-call   { background: #ebf8ff; color: #2b6cb0; }
+.tact-call:hover { background: #bee3f8; }
+.tact-done   { background: #f0fff4; color: #276749; }
+.tact-done:hover { background: #c6f6d5; }
+.tact-noshow { background: #fff5f5; color: #c53030; }
+.tact-noshow:hover { background: #fed7d7; }
+.tact-delete { background: #f7fafc; color: var(--color-text-muted); }
+.tact-delete:hover { background: #fed7d7; color: #c53030; }
+
+/* Ticket status badges */
+.ticket-status {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.status-waiting     { background: #ebf8ff; color: #2b6cb0; }
+.status-called      { background: #fefcbf; color: #744210; }
+.status-progress    { background: #fef3c7; color: #92400e; }
+.status-done        { background: #f0fff4; color: #276749; }
+.status-noshow      { background: #f7fafc; color: #718096; }
+.status-transferred { background: #faf5ff; color: #6b46c1; }
+
+.empty-queue {
+  text-align: center;
+  padding: 60px;
+  color: var(--color-text-muted);
+  font-size: 16px;
+}
+
 /* ─── Responsive ────────────────────────────────── */
 @media (max-width: 768px) {
   .sidebar { width: 200px; }
   .main-content { margin-left: 200px; padding: 20px; }
   [dir="rtl"] .main-content { margin-left: 0; margin-right: 200px; }
   .form-row { grid-template-columns: 1fr; }
+  .tickets-grid { grid-template-columns: 1fr; }
 }

@@ -48,6 +48,11 @@ const en = {
   priority4: 'Semi-urgent',
   priority5: 'Non-urgent',
 
+  // Queue
+  register: 'Register Patient',
+  queueMonitor: 'Queue Monitor',
+  reports: 'Reports',
+
   // Greetings
   welcomeAdmin: 'Welcome, Admin',
   welcomeManager: 'Welcome, Manager',

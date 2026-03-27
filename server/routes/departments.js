@@ -19,14 +19,14 @@ router.get('/', async (req, res) => {
 // POST /api/departments
 router.post('/', requireRole('admin'), async (req, res) => {
   try {
-    const { name_en, name_ar, type, is_active } = req.body;
+    const { name_en, name_ar, type, code, is_active } = req.body;
     if (!name_en || !name_ar || !type)
       return res.status(400).json({ message: 'All fields required' });
 
     const db = await getDb();
     const [result] = await db.execute(
-      'INSERT INTO departments (name_en, name_ar, type, is_active) VALUES (?, ?, ?, ?)',
-      [name_en, name_ar, type, is_active ?? 1]
+      'INSERT INTO departments (name_en, name_ar, type, code, is_active) VALUES (?, ?, ?, ?, ?)',
+      [name_en, name_ar, type, (code || name_en.slice(0,3).toUpperCase()), is_active ?? 1]
     );
     res.status(201).json({ id: result.insertId, message: 'Department created' });
   } catch (err) {
@@ -37,11 +37,11 @@ router.post('/', requireRole('admin'), async (req, res) => {
 // PUT /api/departments/:id
 router.put('/:id', requireRole('admin'), async (req, res) => {
   try {
-    const { name_en, name_ar, type, is_active } = req.body;
+    const { name_en, name_ar, type, code, is_active } = req.body;
     const db = await getDb();
     await db.execute(
-      'UPDATE departments SET name_en=?, name_ar=?, type=?, is_active=? WHERE id=?',
-      [name_en, name_ar, type, is_active ?? 1, req.params.id]
+      'UPDATE departments SET name_en=?, name_ar=?, type=?, code=?, is_active=? WHERE id=?',
+      [name_en, name_ar, type, (code || name_en.slice(0,3).toUpperCase()), is_active ?? 1, req.params.id]
     );
     res.json({ message: 'Department updated' });
   } catch (err) {

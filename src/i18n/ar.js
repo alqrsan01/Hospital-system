@@ -48,6 +48,11 @@ const ar = {
   priority4: 'شبه عاجل',
   priority5: 'غير عاجل',
 
+  // Queue
+  register: 'تسجيل مريض',
+  queueMonitor: 'مراقبة الطابور',
+  reports: 'التقارير',
+
   // Greetings
   welcomeAdmin: 'مرحباً، المدير',
   welcomeManager: 'مرحباً، المدير',

@@ -24,14 +24,14 @@ router.get('/', async (req, res) => {
 // POST /api/clinics
 router.post('/', requireRole('admin'), async (req, res) => {
   try {
-    const { name_en, name_ar, department_id, is_active } = req.body;
+    const { name_en, name_ar, code, department_id, is_active } = req.body;
     if (!name_en || !name_ar)
       return res.status(400).json({ message: 'All fields required' });
 
     const db = await getDb();
     const [result] = await db.execute(
-      'INSERT INTO clinics (name_en, name_ar, department_id, is_active) VALUES (?, ?, ?, ?)',
-      [name_en, name_ar, department_id || null, is_active ?? 1]
+      'INSERT INTO clinics (name_en, name_ar, code, department_id, is_active) VALUES (?, ?, ?, ?, ?)',
+      [name_en, name_ar, (code || name_en.slice(0,3).toUpperCase()), department_id || null, is_active ?? 1]
     );
     res.status(201).json({ id: result.insertId, message: 'Clinic created' });
   } catch (err) {
@@ -42,11 +42,11 @@ router.post('/', requireRole('admin'), async (req, res) => {
 // PUT /api/clinics/:id
 router.put('/:id', requireRole('admin'), async (req, res) => {
   try {
-    const { name_en, name_ar, department_id, is_active } = req.body;
+    const { name_en, name_ar, code, department_id, is_active } = req.body;
     const db = await getDb();
     await db.execute(
-      'UPDATE clinics SET name_en=?, name_ar=?, department_id=?, is_active=? WHERE id=?',
-      [name_en, name_ar, department_id || null, is_active ?? 1, req.params.id]
+      'UPDATE clinics SET name_en=?, name_ar=?, code=?, department_id=?, is_active=? WHERE id=?',
+      [name_en, name_ar, (code || name_en.slice(0,3).toUpperCase()), department_id || null, is_active ?? 1, req.params.id]
     );
     res.json({ message: 'Clinic updated' });
   } catch (err) {

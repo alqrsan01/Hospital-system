@@ -4,15 +4,18 @@ import { useLanguage } from '../contexts/LanguageContext.jsx';
 
 const NAV_ITEMS = {
   admin: [
-    { key: 'dashboard', path: '/admin' },
-    { key: 'users', path: '/admin/users' },
-    { key: 'departments', path: '/admin/departments' },
-    { key: 'clinics', path: '/admin/clinics' },
+    { key: 'dashboard',  path: '/admin' },
+    { key: 'register',   path: '/admin/register' },
+    { key: 'queue',      path: '/admin/queue' },
+    { key: 'users',      path: '/admin/users' },
+    { key: 'departments',path: '/admin/departments' },
+    { key: 'clinics',    path: '/admin/clinics' },
   ],
   manager: [
     { key: 'dashboard', path: '/manager' },
-    { key: 'queue', path: '/manager/queue' },
-    { key: 'reports', path: '/manager/reports' },
+    { key: 'register',  path: '/manager/register' },
+    { key: 'queue',     path: '/manager/queue' },
+    { key: 'reports',   path: '/manager/reports' },
   ],
   doctor: [
     { key: 'queue', path: '/doctor' },
