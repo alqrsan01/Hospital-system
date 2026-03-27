@@ -33,6 +33,7 @@ function AppRoutes() {
               <Route path="register" element={<RegisterPatient />} />
               <Route path="queue" element={<QueueMonitor />} />
               <Route path="patients" element={<PatientHistory />} />
+              <Route path="reports" element={<ManagerReports />} />
             </Routes>
           </Layout>
         </ProtectedRoute>

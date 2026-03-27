@@ -8,6 +8,7 @@ const NAV_ITEMS = {
     { key: 'register',   path: '/admin/register' },
     { key: 'queue',      path: '/admin/queue' },
     { key: 'patients',   path: '/admin/patients' },
+    { key: 'reports',    path: '/admin/reports' },
     { key: 'users',      path: '/admin/users' },
     { key: 'departments',path: '/admin/departments' },
     { key: 'clinics',    path: '/admin/clinics' },
