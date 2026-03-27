@@ -18,7 +18,7 @@ const NAV_ITEMS = {
     { key: 'reports',   path: '/manager/reports' },
   ],
   doctor: [
-    { key: 'queue', path: '/doctor' },
+    { key: 'queue',      path: '/doctor' },
   ],
   screen: [],
 };
