@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLanguage } from '../../contexts/LanguageContext.jsx';
 import { PRIORITY_OPTIONS } from '../../constants/queue.js';
+import { exportReportCsv } from '../../utils/exportCsv.js';
 
 export default function ManagerReports() {
   const { isRTL } = useLanguage();
@@ -51,6 +52,11 @@ export default function ManagerReports() {
               onChange={e => setDate(e.target.value)}
               style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid var(--color-border)', fontSize: 14 }}
             />
+            {stats && totalToday > 0 && (
+              <button className="btn-secondary" onClick={() => exportReportCsv(stats, date)}>
+                ⬇ {isRTL ? 'تصدير CSV' : 'Export CSV'}
+              </button>
+            )}
           </div>
         </div>
       </div>
