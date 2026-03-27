@@ -1197,6 +1197,315 @@ body {
 
 .no-clinic-warning h2 { font-size: 22px; color: var(--color-text); }
 
+/* ─── Waiting Room Screen ───────────────────────── */
+.ws-root {
+  min-height: 100vh;
+  background: #07111f;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  overflow: hidden;
+}
+
+/* Header */
+.ws-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: #0d1f35;
+  border-bottom: 2px solid #1a3a5c;
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.ws-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #63b3ed;
+  letter-spacing: 0.5px;
+}
+
+.ws-clock-block { text-align: center; }
+
+.ws-time {
+  font-size: 36px;
+  font-weight: 800;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.ws-date {
+  font-size: 13px;
+  color: #90cdf4;
+  margin-top: 4px;
+}
+
+.ws-lang-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #e2e8f0;
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.ws-lang-btn:hover { background: rgba(255,255,255,0.15); }
+
+/* Flash banner */
+.ws-flash-banner {
+  background: linear-gradient(90deg, #d69e2e, #dd6b20);
+  color: white;
+  text-align: center;
+  padding: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  animation: flashIn 0.4s ease;
+  flex-shrink: 0;
+}
+
+@keyframes flashIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* States */
+.ws-loading, .ws-error, .ws-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 16px;
+  font-size: 20px;
+  color: #90cdf4;
+}
+
+.ws-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #1a3a5c;
+  border-top-color: #63b3ed;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.ws-error { color: #fc8181; }
+
+/* Main layout */
+.ws-main {
+  flex: 1;
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Emergency / Pharmacy row */
+.ws-emergency-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+/* Regular clinics grid */
+.ws-clinics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* Clinic card */
+.ws-clinic-card {
+  background: #0d1f35;
+  border: 2px solid #1a3a5c;
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.ws-clinic-card.large {
+  padding: 24px;
+}
+
+.ws-clinic-card.flashing {
+  border-color: #d69e2e;
+  box-shadow: 0 0 24px rgba(214,158,46,0.5);
+  animation: cardPulse 2s ease infinite;
+}
+
+@keyframes cardPulse {
+  0%, 100% { box-shadow: 0 0 24px rgba(214,158,46,0.4); }
+  50%       { box-shadow: 0 0 40px rgba(214,158,46,0.8); }
+}
+
+.wcc-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #90cdf4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #1a3a5c;
+  padding-bottom: 10px;
+}
+
+.ws-clinic-card.large .wcc-name { font-size: 20px; }
+
+.wcc-serving-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #63b3ed;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Ticket being served */
+.wcc-ticket {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+}
+
+.wcc-number {
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.ws-clinic-card.large .wcc-number { font-size: 56px; }
+
+.wcc-patient {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.ws-clinic-card.large .wcc-patient { font-size: 20px; }
+
+.wcc-priority-pill {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.wcc-no-serving {
+  font-size: 22px;
+  color: #4a6785;
+  text-align: center;
+  padding: 12px;
+  font-style: italic;
+}
+
+/* Waiting list */
+.wcc-waiting { display: flex; flex-direction: column; gap: 6px; }
+
+.wcc-waiting-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #63b3ed;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.wcc-waiting-list { display: flex; flex-direction: column; gap: 4px; }
+
+.wcc-waiting-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  border-left: 3px solid;
+}
+
+[dir="rtl"] .wcc-waiting-row { border-left: none; border-right: 3px solid; }
+
+.wcc-w-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.wcc-w-num { font-size: 14px; font-weight: 700; color: #e2e8f0; }
+
+.wcc-more { font-size: 12px; color: #718096; text-align: center; padding: 2px; }
+
+.wcc-clear { font-size: 14px; color: #68d391; text-align: center; padding: 8px; }
+
+/* Footer ticker */
+.ws-footer {
+  display: flex;
+  align-items: center;
+  background: #0d1f35;
+  border-top: 2px solid #1a3a5c;
+  height: 44px;
+  flex-shrink: 0;
+  overflow: hidden;
+  gap: 0;
+}
+
+.ws-footer-label {
+  background: #e53e3e;
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 16px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.ws-ticker-wrap {
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.ws-ticker {
+  white-space: nowrap;
+  font-size: 14px;
+  color: #90cdf4;
+  font-weight: 600;
+  padding-left: 100%;
+  animation: ticker 30s linear infinite;
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
 /* ─── Responsive ────────────────────────────────── */
 @media (max-width: 900px) {
   .doctor-layout { grid-template-columns: 1fr; }
@@ -1209,4 +1518,8 @@ body {
   [dir="rtl"] .main-content { margin-left: 0; margin-right: 200px; }
   .form-row { grid-template-columns: 1fr; }
   .tickets-grid { grid-template-columns: 1fr; }
+  .ws-header { padding: 12px 16px; }
+  .ws-time { font-size: 26px; }
+  .ws-logo { font-size: 16px; }
+  .ws-clinics-grid { grid-template-columns: 1fr 1fr; }
 }

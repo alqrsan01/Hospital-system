@@ -167,6 +167,55 @@ router.get('/stats', requireRole('admin', 'manager'), async (req, res) => {
   }
 });
 
+// GET /api/queue/screen  — optimized payload for waiting room TV display
+router.get('/screen', requireRole('admin', 'manager', 'doctor', 'screen'), async (req, res) => {
+  try {
+    const db = await getDb();
+    const today = new Date().toISOString().slice(0, 10);
+
+    // All active tickets today (waiting + called + in_progress)
+    const [tickets] = await db.execute(`
+      SELECT
+        qt.id, qt.ticket_number, qt.priority, qt.status, qt.called_at,
+        qt.clinic_id, qt.department_id,
+        p.name_en, p.name_ar, p.gender,
+        c.name_en AS clinic_name_en, c.name_ar AS clinic_name_ar,
+        d.name_en  AS dept_name_en,  d.name_ar  AS dept_name_ar, d.type AS dept_type
+      FROM queue_tickets qt
+      JOIN patients p ON qt.patient_id = p.id
+      LEFT JOIN clinics c ON qt.clinic_id = c.id
+      LEFT JOIN departments d ON qt.department_id = d.id
+      WHERE DATE(qt.created_at) = ?
+        AND qt.status IN ('waiting','called','in_progress')
+      ORDER BY qt.priority ASC, qt.created_at ASC
+    `, [today]);
+
+    // Group by clinic/department
+    const groups = {};
+    for (const t of tickets) {
+      const key  = t.clinic_id ? `c-${t.clinic_id}` : `d-${t.department_id}`;
+      const nameEn = t.clinic_name_en || t.dept_name_en || 'Unknown';
+      const nameAr = t.clinic_name_ar || t.dept_name_ar || 'غير معروف';
+      const type   = t.dept_type || 'clinic';
+
+      if (!groups[key]) {
+        groups[key] = { key, nameEn, nameAr, type, serving: null, waiting: [] };
+      }
+
+      if (t.status === 'called' || t.status === 'in_progress') {
+        groups[key].serving = t;
+      } else {
+        groups[key].waiting.push(t);
+      }
+    }
+
+    res.json(Object.values(groups));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // PUT /api/queue/:id/status  — update ticket status
 router.put('/:id/status', requireRole('admin', 'manager', 'doctor'), async (req, res) => {
   try {
