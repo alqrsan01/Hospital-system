@@ -5,6 +5,9 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Layout from './components/Layout.jsx';
 import Login from './pages/Login.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import Users from './pages/admin/Users.jsx';
+import Departments from './pages/admin/Departments.jsx';
+import Clinics from './pages/admin/Clinics.jsx';
 import ManagerDashboard from './pages/manager/ManagerDashboard.jsx';
 import DoctorQueue from './pages/doctor/DoctorQueue.jsx';
 import WaitingScreen from './pages/screen/WaitingScreen.jsx';
@@ -20,6 +23,9 @@ function AppRoutes() {
           <Layout>
             <Routes>
               <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<Users />} />
+              <Route path="departments" element={<Departments />} />
+              <Route path="clinics" element={<Clinics />} />
             </Routes>
           </Layout>
         </ProtectedRoute>
@@ -47,7 +53,7 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
 
-      {/* Waiting Screen — no sidebar */}
+      {/* Waiting Screen */}
       <Route path="/screen" element={
         <ProtectedRoute roles={['screen']}>
           <WaitingScreen />

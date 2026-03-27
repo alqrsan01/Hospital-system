@@ -3,6 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { initDb } from './database/db.js';
 import authRoutes from './routes/auth.js';
+import userRoutes from './routes/users.js';
+import departmentRoutes from './routes/departments.js';
+import clinicRoutes from './routes/clinics.js';
 
 dotenv.config();
 
@@ -14,9 +17,12 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/departments', departmentRoutes);
+app.use('/api/clinics', clinicRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
 // Start
 initDb()
