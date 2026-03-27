@@ -793,6 +793,13 @@ body {
   font-weight: 600;
 }
 
+.ticket-dest {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-top: 6px;
+}
+
 /* ─── Queue Monitor ─────────────────────────────── */
 .queue-stats-row {
   display: flex;

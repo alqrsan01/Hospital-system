@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLanguage } from '../../contexts/LanguageContext.jsx';
 import { PRIORITY_OPTIONS } from '../../constants/queue.js';
+import { printTicket } from '../../utils/printTicket.js';
 
 const EMPTY_FORM = {
   name_en: '', name_ar: '', age: '', gender: 'male',
@@ -16,7 +17,7 @@ export default function RegisterPatient() {
   const [departments, setDepartments] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(null); // { ticket_number }
+  const [success, setSuccess] = useState(null); // { ticket_number, name_en, name_ar, priority, destination_en, destination_ar, notes }
 
   useEffect(() => {
     Promise.all([
@@ -49,7 +50,28 @@ export default function RegisterPatient() {
         notes: form.notes || null,
       };
       const res = await axios.post('/api/queue/register', payload);
-      setSuccess({ ticket_number: res.data.ticket_number });
+
+      // Resolve destination name for the ticket
+      let destination_en = '', destination_ar = '';
+      if (form.destination_type === 'clinic') {
+        const c = clinics.find(x => String(x.id) === String(form.clinic_id));
+        destination_en = c?.name_en || '';
+        destination_ar = c?.name_ar || '';
+      } else {
+        const d = departments.find(x => String(x.id) === String(form.department_id));
+        destination_en = d?.name_en || '';
+        destination_ar = d?.name_ar || '';
+      }
+
+      setSuccess({
+        ticket_number: res.data.ticket_number,
+        name_en: form.name_en,
+        name_ar: form.name_ar,
+        priority: Number(form.priority),
+        destination_en,
+        destination_ar,
+        notes: form.notes || null,
+      });
       setForm(EMPTY_FORM);
     } catch (err) {
       setError(err.response?.data?.message || (isRTL ? 'حدث خطأ' : 'An error occurred'));
@@ -73,9 +95,17 @@ export default function RegisterPatient() {
             <div className="ticket-icon">🎫</div>
             <div className="ticket-number">{success.ticket_number}</div>
             <div className="ticket-label">{isRTL ? 'رقم التذكرة' : 'Ticket Number'}</div>
-            <button className="btn-primary" style={{ marginTop: 16 }} onClick={() => setSuccess(null)}>
-              {isRTL ? 'تسجيل مريض آخر' : 'Register Another'}
-            </button>
+            <div className="ticket-dest">
+              {isRTL ? success.destination_ar : success.destination_en}
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button className="btn-primary" onClick={() => printTicket(success)}>
+                🖨 {isRTL ? 'طباعة التذكرة' : 'Print Ticket'}
+              </button>
+              <button className="btn-secondary" onClick={() => setSuccess(null)}>
+                {isRTL ? 'تسجيل مريض آخر' : 'Register Another'}
+              </button>
+            </div>
           </div>
         </div>
       )}
