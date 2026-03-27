@@ -38,6 +38,7 @@ const en = {
   departments: 'Departments',
   queue: 'Queue',
   reports: 'Reports',
+  patients: 'Patients',
   settings: 'Settings',
 
   // Priority levels

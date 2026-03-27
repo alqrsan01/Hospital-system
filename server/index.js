@@ -7,6 +7,7 @@ import userRoutes from './routes/users.js';
 import departmentRoutes from './routes/departments.js';
 import clinicRoutes from './routes/clinics.js';
 import queueRoutes from './routes/queue.js';
+import patientRoutes from './routes/patients.js';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/clinics', clinicRoutes);
 app.use('/api/queue', queueRoutes);
+app.use('/api/patients', patientRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));

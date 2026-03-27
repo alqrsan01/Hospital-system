@@ -7,6 +7,7 @@ const NAV_ITEMS = {
     { key: 'dashboard',  path: '/admin' },
     { key: 'register',   path: '/admin/register' },
     { key: 'queue',      path: '/admin/queue' },
+    { key: 'patients',   path: '/admin/patients' },
     { key: 'users',      path: '/admin/users' },
     { key: 'departments',path: '/admin/departments' },
     { key: 'clinics',    path: '/admin/clinics' },
@@ -15,6 +16,7 @@ const NAV_ITEMS = {
     { key: 'dashboard', path: '/manager' },
     { key: 'register',  path: '/manager/register' },
     { key: 'queue',     path: '/manager/queue' },
+    { key: 'patients',  path: '/manager/patients' },
     { key: 'reports',   path: '/manager/reports' },
   ],
   doctor: [

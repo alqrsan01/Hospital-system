@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useLanguage } from '../../contexts/LanguageContext.jsx';
 import { PRIORITY_OPTIONS } from '../../constants/queue.js';
@@ -12,7 +13,18 @@ const EMPTY_FORM = {
 
 export default function RegisterPatient() {
   const { isRTL } = useLanguage();
-  const [form, setForm] = useState(EMPTY_FORM);
+  const location = useLocation();
+  const prefill = location.state?.patient;
+
+  const [form, setForm] = useState(() => prefill ? {
+    ...EMPTY_FORM,
+    name_en:   prefill.name_en   || '',
+    name_ar:   prefill.name_ar   || '',
+    age:       prefill.age       || '',
+    gender:    prefill.gender    || 'male',
+    phone:     prefill.phone     || '',
+    id_number: prefill.id_number || '',
+  } : EMPTY_FORM);
   const [clinics, setClinics] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -107,6 +119,14 @@ export default function RegisterPatient() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {prefill && !success && (
+        <div className="alert-info">
+          {isRTL
+            ? `إعادة تسجيل: ${prefill.name_ar} — يرجى اختيار الوجهة والأولوية`
+            : `Re-queuing: ${prefill.name_en} — please select destination and priority`}
         </div>
       )}
 

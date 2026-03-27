@@ -38,6 +38,7 @@ const ar = {
   departments: 'الأقسام',
   queue: 'الطابور',
   reports: 'التقارير',
+  patients: 'المرضى',
   settings: 'الإعدادات',
 
   // Priority levels
